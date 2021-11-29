@@ -10,6 +10,7 @@ t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
+t_C_EQ = r'=='
 t_EQ=r'\='
 t_EW_PLUS = r'\.\+'
 t_EW_MINUS = r'\.-'
@@ -18,13 +19,12 @@ t_EW_DIV = r'\./'
 t_EQ_PLUS = r'\+='
 t_EQ_MINUS = r'\-='
 t_EQ_TIMES = r'\*='
-t_EQ_DIVIDE = r'\/='
+t_EQ_DIVIDE = r'='
 t_LT = r'\<'
 t_GT = r'\>'
 t_EQ_LT = r'\<='
 t_EQ_GT = r'\>0'
 t_NOT_EQ = r'\!='
-t_C_EQ = r'=='
 t_RANGE = r'::'
 t_TRANSPOSE = r'\''
 t_STRING = r'"[\s.a-zA-Z_]+"'
@@ -45,7 +45,7 @@ reserved = {
 }
  
 tokens = ['PLUS',  'MINUS',  'TIMES',  'DIVIDE', 'LPAREN',  'RPAREN' ,  'NUMBER', 'ID','EQ', 'EW_PLUS', 'EW_MINUS', 'EW_TIMES','EW_DIV', 'EQ_PLUS',
-          'EQ_MINUS', 'EQ_TIMES', 'EQ_DIVIDE', 'LT','GT','EQ_LT', 'EQ_GT', 'NOT_EQ', 'C_EQ', 'RANGE', 'TRANSPOSE', 'INT_CONST', 'FLOAT_CONST', 'STRING'] + list(reserved.values())
+          'EQ_MINUS', 'EQ_TIMES', 'EQ_DIVIDE', 'LT','GT','EQ_LT', 'EQ_GT', 'NOT_EQ', 'C_EQ', 'RANGE', 'TRANSPOSE', 'INT_VAL', 'DOUBLE_VAL', 'STRING'] + list(reserved.values())
  
 def t_COMMENT(t):
     r'\#.*'
@@ -56,25 +56,18 @@ def t_ID(t):
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
-r_NUM_CONST = r'[0-9]*\.?[0-9]+((E|e)(\+|-)?[0-9]+)?'
+r_INT_CONST = r'^[-+]?\d*$'
+r_FLOAT_CONST = r'^[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?$'
 
-@Token(r_NUM_CONST)
-def t_NUM_CONST(token):
-    try:
-        token.value = int(token.value)
-        token.type = 'INT_CONST'
-        return token
-    except ValueError:
-        pass
+def t_DOUBLE_VAL(t):
+    '[-+]?[0-9]+(\.([0-9]+)?([eE][-+]?[0-9]+)?|[eE][-+]?[0-9]+)'
+    return t
 
-    try:
-        token.value = float(token.value)
-        token.type = 'FLOAT_CONST'
-        return token
-    except ValueError:
-        pass
+def t_INT_VAL(t):
+    r'[-+]?[0-9]+'
+    return t
 
-t_ignore = '  \t'
+t_ignore = '\t'
 
 def t_newline(t):
     r'\n+'
